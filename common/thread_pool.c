@@ -24,16 +24,17 @@ int number() {////
     int i = 0;
     int j = 0;
     int sum = 0;
-    for (int a = 0; i < MAX; i++) {
+    for (int a = 0; a < MAX; a++) {
         if (bteam[a].online) i++;
-        if (rteam[a].online) j++;
+       else if (rteam[a].online) j++;
     }
     sum = i + j;
     return sum;
-}
+}////
+
 
 void send_to(char *to, struct ChatMsg *msg, int fd) {
-    
+    flag = 0;
     for (int i = 0; i < MAX; i++) {
         if (rteam[i].online && (!strcmp(to, rteam[i].name))) {
             send(rteam[i].fd, msg, sizeof(struct ChatMsg), 0);
@@ -108,7 +109,7 @@ void do_work(struct User *user){
         bzero(msg.msg, sizeof(msg.msg));
         msg.type = CHAT_SYS;
         int num = number();
-        sprintf(msg.msg, "当前有 5 位小伙伴在线");
+        sprintf(msg.msg, "当前有 %d 位小伙伴在线", num);
         send(user->fd, (void *)&msg, sizeof(msg), 0);
     }
 }
