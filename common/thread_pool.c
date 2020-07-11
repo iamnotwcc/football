@@ -20,6 +20,18 @@ void send_all(struct ChatMsg *msg)
     }
 }
 
+int number() {////
+    int i = 0;
+    int j = 0;
+    int sum = 0;
+    for (int a = 0; i < MAX; i++) {
+        if (bteam[a].online) i++;
+        if (rteam[a].online) j++;
+    }
+    sum = i + j;
+    return sum;
+}
+
 void send_to(char *to, struct ChatMsg *msg, int fd) {
     
     for (int i = 0; i < MAX; i++) {
@@ -55,7 +67,7 @@ void do_work(struct User *user){
         printf("<%s> : %s \n", user->name, msg.msg);//公聊
         send_all(&msg);
        // send(user->fd, (void *)&msg, sizeof(msg), 0);/////送给所有人
-    } else if (msg.type & CHAT_MSG) {//判断当前user的name是否和@同
+    } else if (msg.type & CHAT_MSG) {
         char to[20] = {0};
         int i = 1;
         for ( ; i <=21; i++ ) {
@@ -92,6 +104,12 @@ void do_work(struct User *user){
             pthread_mutex_unlock(&rmutex);
         printf(GREEN"Server Info"NONE" : %s logout!\n", user->name);
         close(user->fd);
+    } else if (msg.type & CHAT_FUNC) {////
+        bzero(msg.msg, sizeof(msg.msg));
+        msg.type = CHAT_SYS;
+        int num = number();
+        sprintf(msg.msg, "当前有 5 位小伙伴在线");
+        send(user->fd, (void *)&msg, sizeof(msg), 0);
     }
 }
 

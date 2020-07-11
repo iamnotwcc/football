@@ -119,14 +119,17 @@ int main(int argc, char **argv) {
     while(1) {
         bzero(&msg, sizeof(msg));
         msg.type = CHAT_WALL;
-        printf(RED"Please input: \n"NONE);
+       // printf(RED"Please input:\n "NONE);
         scanf("%[^\n]s", msg.msg);
         strcpy(msg.name, request.name);////
         getchar();
         if (strlen(msg.msg)) {//
-            if (msg.msg[0] == '@') msg.type = CHAT_MSG;//
-            if (msg.msg[0] == '#') msg.type = CHAT_FUNC;//
-            send(sockfd, (void *)&msg, sizeof(msg), 0);
+        if (msg.msg[0] == '@') {
+           // printf(BLUE"<私信>%s : ", request.name);
+            msg.type = CHAT_MSG;//
+        }
+        if (msg.msg[0] == '#') msg.type = CHAT_FUNC;//
+        send(sockfd, (void *)&msg, sizeof(msg), 0);
         }
     }
     
