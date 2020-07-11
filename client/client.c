@@ -11,6 +11,7 @@ int server_port = 0;
 char server_ip[20] = {0};
 char *conf = "./football.conf";
 int sockfd = -1;
+int team = -1; /////
 
 void logout(int signum) 
 {
@@ -18,7 +19,7 @@ void logout(int signum)
     msg.type = CHAT_FIN;
     send(sockfd, (void *)&msg, sizeof(msg), 0);
     close(sockfd);
-    printf(RED"Bye!\n"NONE);
+    printf(RED"\nBye!\n"NONE);
     exit(0);
 }
 
@@ -109,15 +110,24 @@ int main(int argc, char **argv) {
    // recv(sockfd, buff, sizeof(buff), 0);
    // DBG(RED"Server info"NONE" : %s", buff);
    
+   pthread_t recv_t;//
+   pthread_create(&recv_t, NULL, do_recv, NULL);//
+
     signal(SIGINT, logout);
+    struct ChatMsg msg;
     
     while(1) {
-        struct ChatMsg msg;
+        bzero(&msg, sizeof(msg));
         msg.type = CHAT_WALL;
         printf(RED"Please input: \n"NONE);
         scanf("%[^\n]s", msg.msg);
+        strcpy(msg.name, request.name);////
         getchar();
-        send(sockfd, (void *)&msg, sizeof(msg), 0);
+        if (strlen(msg.msg)) {//
+            if (msg.msg[0] == '@') msg.type = CHAT_MSG;//
+            if (msg.msg[0] == '#') msg.type = CHAT_FUNC;//
+            send(sockfd, (void *)&msg, sizeof(msg), 0);
+        }
     }
     
     return 0;

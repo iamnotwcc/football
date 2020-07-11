@@ -17,6 +17,24 @@ int repollfd, bepollfd;
 struct User *rteam, *bteam;
 int port = 0;
 
+pthread_mutex_t rmutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t bmutex = PTHREAD_MUTEX_INITIALIZER;
+//////
+void server_logout(int signum)
+{
+    struct ChatMsg msg;
+    bzero(&msg, sizeof(msg));
+    msg.type = CHAT_SYS;
+    char buff[512] = {0};
+    char name[20] = {0};
+    sprintf(name, "Server Info : ");
+    strcpy(msg.name, name);
+    sprintf(buff, "服务器下线，删库跑路！\n");
+    strcpy(msg.msg, buff);
+    send_all(&msg);
+    exit(0);
+}
+/////
 int main(int argc, char **argv) {
     int opt, listener, epollfd;
     pthread_t red_t, blue_t;
@@ -87,6 +105,8 @@ int main(int argc, char **argv) {
     struct sockaddr_in client;
     bzero(&client, sizeof(client));
     socklen_t len = sizeof(client);
+
+    signal(SIGINT, server_logout);
 
     while (1) {
         DBG(YELLOW"Main Reactor"NONE" : Waiting for clienti.\n");
